@@ -2,13 +2,14 @@
  * Created by Hamza Hassan (hamza.hassan92@gmail.com).
  */
 
-package com.frosty92.modules.RCTAudioRecorder;
+package com.frosty92.RNAudioRecorder;
 import android.media.MediaActionSound;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Base64;
 import com.facebook.react.bridge.*;
+import com.facebook.react.bridge.Callback;
 import android.media.MediaScannerConnection;
 import javax.annotation.Nullable;
 import java.io.*;
@@ -20,16 +21,16 @@ import java.util.List;
 import android.content.Intent;
 import android.content.Context;
 
-public class RCTAudioRecorder extends ReactContextBaseJavaModule {
+public class RNAudioRecorderModule extends ReactContextBaseJavaModule {
     private final ReactApplicationContext _reactContext;
      private MediaRecorder audioRecorder = null;
      private File audioFile;
      private String audioFilePath = null;
      private String audioFileName = null;
-     private Promise audioRecorderPromise = null;
+     private Callback audioRecorderCallback = null;
 
 
-    public RCTAudioRecorder(ReactApplicationContext reactContext) {
+    public RNAudioRecorderModule(ReactApplicationContext reactContext) {
         super(reactContext);
         _reactContext = reactContext;      
     }
@@ -41,7 +42,7 @@ public class RCTAudioRecorder extends ReactContextBaseJavaModule {
     private void setFileName() {
         audioFileName = Environment.getExternalStorageDirectory().getAbsolutePath();
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        audioFileName += "/" + timeStamp;
+        audioFileName += "/" + "AUDIO_:" +timeStamp + ".3gp";
     }
 
     private boolean prepareAudioRecorder() {
@@ -59,35 +60,34 @@ public class RCTAudioRecorder extends ReactContextBaseJavaModule {
         }           
     }
     @ReactMethod
-    public void startAudioRecording(final Promise promise) {
-        if (audioRecorderPromise == null) {
+    public void startAudioRecording(final Callback successCallback, final Callback errorCallback) {
+        if (audioRecorderCallback == null) {
             if (prepareAudioRecorder()) {
                 try {
                     audioRecorder.start();
-                    audioRecorderPromise = promise;
+                    audioRecorderCallback = successCallback;
                 } catch (final Exception e) {
-                    promise.reject("error: unable to invoke audioRecorder.start(): " + e.getMessage());
+                    errorCallback.invoke("error: unable to invoke audioRecorder.start(): " + e.getMessage());
                 }  
             } else {
-                promise.reject("AudioRecorder returned false");
+                errorCallback.invoke("AudioRecorder returned false");
             }
         } else {
-            promise.reject("AudioRecorderPromise was not null");
+            errorCallback.invoke("AudioRecorderCallback was not null");
         }        
     }
 
     @ReactMethod
-    public void stopAudioRecording(final Promise promise) {     
-        if (audioRecorderPromise != null) {
+    public void stopAudioRecording(final Callback callback) {     
+        if (audioRecorderCallback != null) {
             audioFile = new File(audioFileName);
             audioFilePath = audioFile.getAbsolutePath();
             Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);         
             intent.setData(Uri.fromFile(audioFile));
             _reactContext.sendBroadcast(intent);
             releaseAudioRecorder();
-            promise.resolve("finished recording");
         } else {
-            promise.resolve("not recording");
+            callback.invoke("not recording");
         }
     }
     private void releaseAudioRecorder() {
@@ -95,9 +95,9 @@ public class RCTAudioRecorder extends ReactContextBaseJavaModule {
             audioRecorder.stop();
             audioRecorder.release();
              audioRecorder = null;
-            if (audioRecorderPromise != null) {
-                audioRecorderPromise.resolve(audioFileName);
-                audioRecorderPromise = null;
+            if (audioRecorderCallback != null) {
+                audioRecorderCallback.invoke(audioFileName);
+                audioRecorderCallback = null;
             }   
         }       
     }

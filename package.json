@@ -1,6 +1,6 @@
 {
   "name": "react-native-audio-android",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A simple audio recorder for Android",
   "main": "recorder.js",
   "scripts": {
@@ -13,6 +13,10 @@
     "recorder",
     "android"
   ],
+  "repository" : {
+    "type" : "git",
+    "url" : "https://github.com/Frosty92/react-native-audio-android"
+  },
   "author": "Hamza Hassan <hamza.hassan92@gmail.com>",
   "license": "ISC"
 }

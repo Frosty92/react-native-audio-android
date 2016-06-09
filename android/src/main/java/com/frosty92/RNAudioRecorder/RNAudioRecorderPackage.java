@@ -1,4 +1,4 @@
-package com.frosty92.modules.RCTAudioRecorder;
+package com.frosty92.RNAudioRecorder;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,12 +9,12 @@ import com.facebook.react.bridge.JavaScriptModule;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.uimanager.ViewManager;
 
-public class RCTAudioRecorderPackage implements ReactPackage {
+public class RNAudioRecorderPackage implements ReactPackage {
 
   @Override
   public List<NativeModule> createNativeModules (ReactApplicationContext context) {
       List<NativeModule> modules = new ArrayList<>();
-      modules.add(new RCTAudioRecorder(context));
+      modules.add(new RNAudioRecorderModule(context));
       return modules;
   }
   @Override
