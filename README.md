@@ -41,7 +41,7 @@ public class MainActivity extends ReactActivity {
   }
 ```
 
-##Basic Usage: 
+##Usage: 
 
 ```
 //import the module
@@ -49,20 +49,16 @@ let AudioRecorder = require('react-native-audio-android');
 let audioRecorder = new AudioRecorder();
 
 //to start recording audio:
-      audioRecorder.startAudioRecording()
-            .then(data => {
-                console.log(data);
-            })
-            .catch(console.log)
+       audioRecorder.startAudioRecording((success) => {
+          console.log(success);
+        }, (error) => {
+        console.log(error);
+        });
         
         
   //to stop recording audio: 
   
-     audioRecorder.stopAudioRecording()
-            .then(data => {
-                console.log(data);
-            })
-            .catch(console.log)
+     audioRecorder.stopAudioRecording((result) => console.log(result));
         
         
         
